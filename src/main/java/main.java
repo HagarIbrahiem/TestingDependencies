@@ -1,6 +1,8 @@
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import joinery.DataFrame;
 import static tech.tablesaw.aggregate.AggregateFunctions.median;
 import tech.tablesaw.api.DoubleColumn;
@@ -15,10 +17,16 @@ public class main {
             System.out.println(nc.print());
             
             ////////tablesaw ////////
-            //Table t = Table.createFromCsv("D:\\titanic-passengers.csv");
-            //List<Column> dataStructure = titanicData.columns();
+            ReadCSVByTableSaw ();
+           ///////joinery.DataFrame////////
+           ReadCSVByJoinery();
+    }
 
-            Table titanicData = Table.read().file("D:\titanic-passengers.csv");
+    public static void ReadCSVByTableSaw() {
+      
+        try {
+
+            Table titanicData = Table.read().csv("titanic-passengers.csv");
             List<String> colNames = titanicData.columnNames();
             titanicData.structure().printAll();
             titanicData .structure() .where(titanicData.structure().stringColumn("Column Type").isEqualTo("String"));
@@ -33,19 +41,28 @@ public class main {
             PassByGender.setName("Median Passengers by Gender");
             PassByGender.column("Median Passengers by Gender").summary().print();
   
-            PassByGender.write().csv("D:\\titanic-passengers-Updated.csv");
+            PassByGender.write().csv("titanic-passengers-Updated.csv");
+        } catch (IOException ex) {
+            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+        }
             
-           ///////joinery.DataFrame////////
-            DataFrame<Object> df = DataFrame.readCsv("D:\\titanic-passengers.csv");
+    }
+
+    public static void ReadCSVByJoinery() {
+        try {
+            DataFrame<Object> df = DataFrame.readCsv("titanic-passengers.csv");
             List<Object> countrylst = df.col("Name");
             System.out.println(" No. of Passangers = " + countrylst.size());
             System.out.println("Passangers are :  " + countrylst);
             
-             DataFrame<Object> passengersGroupedByPClass = df.groupBy("Pclass")
-              .count()
-              .sortBy("Age")
-              .head(10);
+            DataFrame<Object> passengersGroupedByPClass = df.groupBy("Pclass")
+                    .count()
+                    .sortBy("Age")
+                    .head(10);
             System.out.println("Passangers are :  " + passengersGroupedByPClass);
+        } catch (IOException ex) {
+            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
